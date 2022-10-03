@@ -1,0 +1,12 @@
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: microqueue-server
+
+app:
+  configurations:
+    server-configurations:
+      server-socket-port: 15675
