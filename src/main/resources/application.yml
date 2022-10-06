@@ -4,7 +4,7 @@ server:
 
 spring:
   application:
-    name: microqueue-server
+    name: micro-queue-server
 
 app:
   configurations:
