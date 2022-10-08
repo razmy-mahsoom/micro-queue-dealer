@@ -9,4 +9,4 @@ spring:
 app:
   configurations:
     server-configurations:
-      server-socket-port: 15675
+      server-socket-port: 15676
