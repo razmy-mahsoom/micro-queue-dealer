@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.microq.dealer.client_test.ClientHandler;
 import org.microq.dealer.config.AbstractServer;
 import org.microq.dealer.config.ServerConfiguration;
+import org.microq.support.auditor.Chaining;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -19,6 +21,10 @@ public class DefaultMicroQueueServer extends AbstractServer {
     @Autowired
     private ServerConfiguration serverConfiguration;
 
+    @Autowired
+    @Qualifier("default")
+    private Chaining chaining;
+
     @Override
     protected ServerConfiguration getServerConfiguration() {
         return serverConfiguration;
@@ -32,6 +38,10 @@ public class DefaultMicroQueueServer extends AbstractServer {
             serverSocket = new ServerSocket(serverConfiguration.getServerSocketPort());
             log.info("Socket info : {}",serverSocket.getLocalSocketAddress().toString());
             log.info("Server hostname  :{}",serverSocket);
+            log.info("Default Chaining detail - Interchange: {}, Sequence:{} withPath: {}",
+                    chaining.getInterchange().getInterchangeName(),
+                    chaining.getSequence().getSequenceName(),
+                    chaining.getPath());
             while (!serverSocket.isClosed()){
                 Socket clientSocket = serverSocket.accept();
                 log.info("new client connected info {}",clientSocket.getLocalSocketAddress().toString());
