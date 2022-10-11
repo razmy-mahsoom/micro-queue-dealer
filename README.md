@@ -3,9 +3,9 @@ MicroQueue dealer/server application that handle the messages that has been prod
 
 Terms used
 
-Brokr -> Dealer
+Broker -> Dealer
 
-Exchnage -> Interchange
+Exchange -> Interchange
 
 Queue -> Sequence
 
