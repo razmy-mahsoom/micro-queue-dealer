@@ -4,8 +4,13 @@ MicroQueue dealer/server application that handle the messages that has been prod
 Terms used
 
 Brokr -> Dealer
+
 Exchnage -> Interchange
+
 Queue -> Sequence
+
 Producer -> Builder
+
 Consumer -> Auditor
+
 Binding -> Path
