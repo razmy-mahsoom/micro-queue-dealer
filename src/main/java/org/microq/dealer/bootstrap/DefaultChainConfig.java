@@ -15,13 +15,12 @@ public class DefaultChainConfig {
     @Bean
     @Qualifier("default")
     public Interchange interchange(){
-        return new DefaultInterchange();
+        return new Interchange("defaultInterchange");
     }
 
     @Bean
-    @Qualifier("default")
     public Sequence sequence(){
-        return new DefaultSequence();
+        return new Sequence("defaultSequence");
     }
 
     @Bean
