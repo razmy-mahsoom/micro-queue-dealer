@@ -2,11 +2,17 @@ package org.microq.dealer.client_test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.source.doctree.SeeTree;
+import org.microq.dealer.queue.InternalInterchange;
+import org.microq.dealer.queue.InternalSequence;
 import org.microq.support.auditor.Chaining;
+import org.microq.support.auditor.Interchange;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ClientHandler implements Runnable{
 
@@ -14,16 +20,16 @@ public class ClientHandler implements Runnable{
     private static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
-    private String clientUsername;
+
+    private Set<InternalInterchange> internalInterchanges = new HashSet<>();
+
 
     public ClientHandler(Socket socket) {
         try {
             this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            //this.clientUsername = bufferedReader.readLine();
             clientHandlers.add(this);
-            //broadcastMessage("Server "+ "new" +" has entered the chat");
         }catch (IOException e){
             closeEverything(socket,bufferedReader,bufferedWriter);
         }
@@ -31,7 +37,6 @@ public class ClientHandler implements Runnable{
 
     @Override
     public void run() {
-
         String messageFromClient;
         while (socket.isConnected()){
             try{
@@ -46,7 +51,7 @@ public class ClientHandler implements Runnable{
     }
 
     public void broadcastMessage(String messageToSend){
-        //System.out.println("Message From Builder - "+messageToSend);
+        System.out.println(messageToSend);
         ObjectMapper mapper = new ObjectMapper();
         Chaining chaining = null;
         try {
@@ -54,14 +59,19 @@ public class ClientHandler implements Runnable{
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(chaining.getInterchange().getInterchangeName());
-        System.out.println(chaining.getSequence().getSequenceName());
-        System.out.println(chaining.getPath());
-        System.out.println(chaining.getClientType());
+
+        InternalInterchange internalInterchange = new InternalInterchange(chaining.getInterchange().getInterchangeName());
+        InternalSequence internalSequence = new InternalSequence(chaining.getSequence().getSequenceName());
+        internalSequence.setPath(chaining.getPath());
+        internalInterchange.getInternalSequences().add(internalSequence);
+
+        internalInterchanges.add(internalInterchange);
+        internalInterchanges.forEach(System.out::println);
+
     }
 
     public void removerClientHandler(){
-        clientHandlers.remove(this);
+        //clientHandlers.remove(this);
         //broadcastMessage("Server " + clientUsername + " has left the chat");
     }
 
