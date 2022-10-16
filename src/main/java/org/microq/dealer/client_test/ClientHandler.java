@@ -2,17 +2,16 @@ package org.microq.dealer.client_test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.source.doctree.SeeTree;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.microq.dealer.componenet.InterchangeCollection;
 import org.microq.dealer.queue.InternalInterchange;
 import org.microq.dealer.queue.InternalSequence;
 import org.microq.support.auditor.Chaining;
-import org.microq.support.auditor.Interchange;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ClientHandler implements Runnable{
 
@@ -20,9 +19,8 @@ public class ClientHandler implements Runnable{
     private static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
-
-    private Set<InternalInterchange> internalInterchanges = new HashSet<>();
-
+//    @Autowired
+//    private ObjectMapper mapper;
 
     public ClientHandler(Socket socket) {
         try {
@@ -37,11 +35,11 @@ public class ClientHandler implements Runnable{
 
     @Override
     public void run() {
-        String messageFromClient;
+        String incomingJsonPayload;
         while (socket.isConnected()){
             try{
-                messageFromClient = bufferedReader.readLine();
-                broadcastMessage(messageFromClient);
+                incomingJsonPayload = bufferedReader.readLine();
+                processIncomingPayload(incomingJsonPayload);
             }catch (IOException e){
                 closeEverything(socket,bufferedReader,bufferedWriter);
                 break;
@@ -50,23 +48,22 @@ public class ClientHandler implements Runnable{
 
     }
 
-    public void broadcastMessage(String messageToSend){
-        System.out.println(messageToSend);
+    public void processIncomingPayload(String jsonPayload){
         ObjectMapper mapper = new ObjectMapper();
-        Chaining chaining = null;
+        Object object =null;
         try {
-            chaining = mapper.readValue(messageToSend, Chaining.class);
+            object = mapper.readValue(jsonPayload,Object.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
 
-        InternalInterchange internalInterchange = new InternalInterchange(chaining.getInterchange().getInterchangeName());
-        InternalSequence internalSequence = new InternalSequence(chaining.getSequence().getSequenceName());
-        internalSequence.setPath(chaining.getPath());
-        internalInterchange.getInternalSequences().add(internalSequence);
+            Chaining chaining = (Chaining) object;
+            InternalInterchange internalInterchange = new InternalInterchange(chaining.getInterchange().getInterchangeName());
+            InternalSequence internalSequence = new InternalSequence(chaining.getSequence().getSequenceName());
+            internalSequence.setPath(chaining.getPath());
+            internalInterchange.getInternalSequences().add(internalSequence);
+            InterchangeCollection.internalInterchangeSet.add(internalInterchange);
 
-        internalInterchanges.add(internalInterchange);
-        internalInterchanges.forEach(System.out::println);
 
     }
 
