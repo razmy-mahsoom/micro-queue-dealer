@@ -59,7 +59,7 @@ public class ClientHandler implements Runnable{
         System.out.println(jsonPayload);
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         MQMessage message = null;
         try {
             message = mapper.readValue(jsonPayload,MQMessage.class);
