@@ -1,5 +1,6 @@
 package org.microq.dealer;
 
+import org.microq.dealer.componenet.InterchangeCollection;
 import org.microq.dealer.config.ServerConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
